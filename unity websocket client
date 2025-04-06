@@ -1,0 +1,49 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using WebSocketSharp;
+using TMPro;
+
+public class WebSocketClient : MonoBehaviour
+{
+    private WebSocket ws;
+    public TextMeshProUGUI chatText;
+    public FaceController faceController;
+
+    void Start()
+    {
+        ws = new WebSocket("ws://localhost:8765");
+        ws.OnMessage += OnMessageReceived;
+        ws.Connect();
+    }
+
+    public void SendUserMessage(string message)
+    {
+        if (ws.ReadyState == WebSocketState.Open)
+        {
+            ws.Send("{\"text\": \"" + message + "\"}");
+        }
+    }
+
+    private void OnMessageReceived(object sender, MessageEventArgs e)
+    {
+        Debug.Log("Received: " + e.Data);
+        AIResponse response = JsonUtility.FromJson<AIResponse>(e.Data);
+        
+        chatText.text = response.text;
+        faceController.SetExpression(response.emotion);
+    }
+
+    void OnDestroy()
+    {
+        if (ws != null) ws.Close();
+    }
+
+    [Serializable]
+    public class AIResponse
+    {
+        public string text;
+        public string emotion;
+    }
+}

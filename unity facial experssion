@@ -1,0 +1,24 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class FaceController : MonoBehaviour
+{
+    public SkinnedMeshRenderer faceMesh;
+    private Dictionary<string, int> expressionBlendShapes = new Dictionary<string, int>
+    {
+        { "neutral", 0 },
+        { "happy", 1 },
+        { "sad", 2 },
+        { "angry", 3 },
+        { "thinking", 4 }
+    };
+
+    public void SetExpression(string emotion)
+    {
+        foreach (var shape in expressionBlendShapes)
+        {
+            faceMesh.SetBlendShapeWeight(shape.Value, (shape.Key == emotion) ? 100f : 0f);
+        }
+    }
+}

@@ -1,0 +1,34 @@
+using System.Collections;
+using UnityEngine;
+
+public class LipSyncController : MonoBehaviour
+{
+    public SkinnedMeshRenderer faceMesh;
+    private bool isSpeaking = false;
+
+    public void StartLipSync()
+    {
+        if (!isSpeaking)
+        {
+            StartCoroutine(LipSyncAnimation());
+        }
+    }
+
+    private IEnumerator LipSyncAnimation()
+    {
+        isSpeaking = true;
+        while (true)
+        {
+            faceMesh.SetBlendShapeWeight(0, Random.Range(0, 100));
+            yield return new WaitForSeconds(0.1f);
+        }
+        isSpeaking = false;
+    }
+
+    public void StopLipSync()
+    {
+        StopCoroutine(LipSyncAnimation());
+        faceMesh.SetBlendShapeWeight(0, 0);
+        isSpeaking = false;
+    }
+}

@@ -1,0 +1,37 @@
+import asyncio
+import websockets
+import json
+from chatbot import get_ai_response
+from speech import generate_speech
+
+connected_clients = set()
+
+async def handle_client(websocket, path):
+    connected_clients.add(websocket)
+    try:
+        async for message in websocket:
+            data = json.loads(message)
+            user_text = data.get("text", "")
+
+            # Get AI Response and emotion
+            ai_response, emotion = get_ai_response(user_text)
+
+            # Generate speech audio file
+            generate_speech(ai_response)
+
+            # Send AI response + emotion data to Unity
+            response_data = json.dumps({"text": ai_response, "emotion": emotion})
+            await websocket.send(response_data)
+
+    except websockets.exceptions.ConnectionClosed:
+        print("Client disconnected")
+    finally:
+        connected_clients.remove(websocket)
+
+async def start_server():
+    server = await websockets.serve(handle_client, "localhost", 8765)
+    print("WebSocket Server started on ws://localhost:8765")
+    await server.wait_closed()
+
+if __name__ == "__main__":
+    asyncio.run(start_server())

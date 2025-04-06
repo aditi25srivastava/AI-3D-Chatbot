@@ -1,0 +1,14 @@
+from elevenlabs import generate, save
+import os
+
+API_KEY = "your-elevenlabs-api-key"
+
+def generate_speech(text):
+    audio = generate(
+        text=text,
+        voice="Bella",
+        model="eleven_monolingual_v1",
+        api_key=API_KEY
+    )
+    save(audio, "response.mp3")
+    os.system("afplay response.mp3")  # Use 'start' on Windows
